@@ -26,6 +26,18 @@ snapordie reset clean
 
 ## Instalación
 
+### Homebrew (macOS / Linux)
+
+```bash
+brew install IvyedSG/tap/snapordie
+```
+
+### Bash one-liner (macOS)
+
+```bash
+curl -fsSL https://github.com/IvyedSG/SnapOrDie/releases/latest/download/snapordie_darwin_arm64.tar.gz | tar xz && sudo mv snapordie /usr/local/bin/
+```
+
 ### Go install
 
 ```bash
