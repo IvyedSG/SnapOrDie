@@ -1,0 +1,6 @@
+/snapordie
+/snapordie.exe
+/dist/
+/tmp/
+*.test
+*.out

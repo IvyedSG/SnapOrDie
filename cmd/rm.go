@@ -7,14 +7,14 @@ import (
 )
 
 var rmCmd = &cobra.Command{
-	Use:     "rm <name>",
+	Use:     "rm <nombre>",
 	Aliases: []string{"del"},
-	Short:   "Delete a snapshot",
-	Long: `Delete a saved snapshot permanently.
+	Short:   "Eliminar un snapshot",
+	Long: `Elimina un snapshot guardado permanentemente.
 
-Examples:
+Ejemplos:
   snapordie rm bug-1234
-  snapordie del old-snapshot`,
+  snapordie del snapshot-viejo`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
@@ -22,12 +22,12 @@ Examples:
 		withContainer(containerFlag, func(cName, dataDir string) {
 			man := snapshot.NewManager(dataDir, cName)
 			if err := man.Remove(name); err != nil {
-				output.Errorf("Snapshot %q not found", name)
-				output.Infof("Run %q to see available snapshots", "snapordie list")
+				output.Errorf("Snapshot %q no encontrado", name)
+				output.Infof("Ejecutá %q para ver los disponibles", "snapordie list")
 				return
 			}
 
-			output.Successf("Snapshot %q removed", name)
+			output.Successf("Snapshot %q eliminado", name)
 		})
 		return nil
 	},

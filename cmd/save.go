@@ -10,16 +10,16 @@ import (
 )
 
 var saveCmd = &cobra.Command{
-	Use:     "save [name]",
+	Use:     "save [nombre]",
 	Aliases: []string{"sv"},
-	Short:   "Save a database snapshot",
-	Long: `Save the current database state as a snapshot.
+	Short:   "Guardar un snapshot",
+	Long: `Guarda el estado actual de la base de datos como un snapshot.
 
-If no name is given, uses the current timestamp.
+Si no se especifica nombre, usa la fecha y hora actual.
 
-Examples:
+Ejemplos:
   snapordie save
-  snapordie sv before-migration
+  snapordie sv antes-de-migration
   snapordie save bug-1234`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -29,12 +29,12 @@ Examples:
 		}
 
 		withContainer(containerFlag, func(cName, dataDir string) {
-			output.Headerf("Save")
+			output.Headerf("Guardar")
 
 			output.Bulletf("Container  %s", cName)
 			output.Infof("Data dir   %s", dataDir)
 
-			s := output.NewStep("Stopping container")
+			s := output.NewStep("Deteniendo container")
 			if err := docker.Stop(cName); err != nil {
 				s.Fail()
 				output.Errorf("stop: %s", err)
@@ -44,7 +44,7 @@ Examples:
 
 			mgr := snapshot.NewManager(dataDir, cName)
 
-			s = output.NewStep("Saving snapshot")
+			s = output.NewStep("Guardando snapshot")
 			snap, err := mgr.Save(name)
 			if err != nil {
 				s.Fail()
@@ -54,7 +54,7 @@ Examples:
 			}
 			s.Donef(snap.Name + "  " + snapshot.HumanSize(snap.SizeBytes))
 
-			s = output.NewStep("Starting container")
+			s = output.NewStep("Iniciando container")
 			if err := docker.Start(cName); err != nil {
 				s.Fail()
 				output.Errorf("start: %s", err)
@@ -66,7 +66,7 @@ Examples:
 			}
 			s.Done()
 
-			output.Successf("Snapshot %q ready", snap.Name)
+			output.Successf("Snapshot %q listo", snap.Name)
 		})
 		return nil
 	},

@@ -10,12 +10,12 @@ import (
 )
 
 var infoCmd = &cobra.Command{
-	Use:     "info <name>",
+	Use:     "info <nombre>",
 	Aliases: []string{"show"},
-	Short:   "Show snapshot details",
-	Long: `Display detailed information about a saved snapshot.
+	Short:   "Ver detalle de un snapshot",
+	Long: `Muestra información detallada de un snapshot guardado.
 
-Examples:
+Ejemplos:
   snapordie info bug-1234
   snapordie show bug-1234`,
 	Args: cobra.ExactArgs(1),
@@ -26,20 +26,20 @@ Examples:
 			man := snapshot.NewManager(dataDir, cName)
 			snap, err := man.Info(name)
 			if err != nil {
-				output.Errorf("Snapshot %q not found", name)
-				output.Infof("Run %q to see available snapshots", "snapordie list")
+				output.Errorf("Snapshot %q no encontrado", name)
+				output.Infof("Ejecutá %q para ver los disponibles", "snapordie list")
 				return
 			}
 
 			output.Headerf("Snapshot  %s", snap.Name)
-			output.Infof("Created    %s", snap.Created.Format(time.RFC822))
-			output.Infof("Size       %s", snapshot.HumanSize(snap.SizeBytes))
+			output.Infof("Creado     %s", snap.Created.Format(time.RFC822))
+			output.Infof("Tamaño     %s", snapshot.HumanSize(snap.SizeBytes))
 			output.Infof("Container  %s", snap.Container)
 			output.Infof("Data dir   %s", snap.DataDir)
-			output.Infof("Location   %s/.snapordie/%s", snap.DataDir, snap.Name)
+			output.Infof("Ubicación  %s/.snapordie/%s", snap.DataDir, snap.Name)
 
 			fmt.Fprintln(output.Writer())
-			output.Infof("Run %q to restore", "snapordie reset "+snap.Name)
+			output.Infof("Para restaurar: snapordie reset %s", snap.Name)
 		})
 		return nil
 	},

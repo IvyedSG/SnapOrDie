@@ -10,16 +10,16 @@ import (
 )
 
 var resetCmd = &cobra.Command{
-	Use:     "reset [name]",
+	Use:     "reset [nombre]",
 	Aliases: []string{"rs"},
-	Short:   "Reset database to a snapshot",
-	Long: `Restore the database to a previously saved snapshot.
+	Short:   "Restaurar base de datos a un snapshot",
+	Long: `Restaura la base de datos a un snapshot guardado previamente.
 
-If no name is given, uses the most recent snapshot.
+Si no se especifica nombre, usa el más reciente.
 
-Examples:
+Ejemplos:
   snapordie reset
-  snapordie rs before-migration
+  snapordie rs antes-de-migration
   snapordie reset bug-1234`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -29,28 +29,28 @@ Examples:
 		}
 
 		withContainer(containerFlag, func(cName, dataDir string) {
-			output.Headerf("Reset")
+			output.Headerf("Restaurar")
 
 			man := snapshot.NewManager(dataDir, cName)
 			snaps, err := man.List()
 			if err != nil || len(snaps) == 0 {
-				output.Errorf("No snapshots found")
-				output.Infof("Run %q to create one", "snapordie save")
-				output.Infof("  snapordie save initial")
+				output.Errorf("No hay snapshots guardados")
+				output.Infof("Creá uno con: snapordie save")
+				output.Infof("  snapordie save inicial")
 				return
 			}
 
 			resetName := name
 			if resetName == "" {
 				resetName = snaps[len(snaps)-1].Name
-				output.Bulletf("Snapshot  %s  (most recent)", resetName)
+				output.Bulletf("Snapshot  %s  (el más reciente)", resetName)
 			} else {
 				output.Bulletf("Snapshot  %s", resetName)
 			}
 
 			output.Infof("Container %s", cName)
 
-			s := output.NewStep("Stopping container")
+			s := output.NewStep("Deteniendo container")
 			if err := docker.Stop(cName); err != nil {
 				s.Fail()
 				output.Errorf("stop: %s", err)
@@ -58,7 +58,7 @@ Examples:
 			}
 			s.Done()
 
-			s = output.NewStep("Restoring snapshot")
+			s = output.NewStep("Restaurando snapshot")
 			if err := man.Reset(resetName); err != nil {
 				s.Fail()
 				output.Errorf("reset: %s", err)
@@ -67,7 +67,7 @@ Examples:
 			}
 			s.Done()
 
-			s = output.NewStep("Starting container")
+			s = output.NewStep("Iniciando container")
 			if err := docker.Start(cName); err != nil {
 				s.Fail()
 				output.Errorf("start: %s", err)
@@ -79,8 +79,8 @@ Examples:
 			}
 			s.Done()
 
-			output.Successf("Database restored to %q", resetName)
-			output.Infof("Run migrations if schema changed")
+			output.Successf("Base de datos restaurada a %q", resetName)
+			output.Infof("Ejecutá migrations si cambió el schema")
 		})
 		return nil
 	},

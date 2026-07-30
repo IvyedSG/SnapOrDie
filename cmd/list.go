@@ -14,10 +14,10 @@ import (
 var listCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls"},
-	Short:   "List all snapshots",
-	Long: `Show all saved database snapshots with name, date, and size.
+	Short:   "Listar snapshots",
+	Long: `Muestra todos los snapshots guardados con nombre, fecha y tamaño.
 
-Examples:
+Ejemplos:
   snapordie list
   snapordie ls`,
 	Args: cobra.NoArgs,
@@ -26,18 +26,18 @@ Examples:
 			man := snapshot.NewManager(dataDir, cName)
 			snaps, err := man.List()
 			if err != nil || len(snaps) == 0 {
-				output.Errorf("No snapshots found")
-				output.Infof("Run %q to create one", "snapordie save")
-				output.Infof("  snapordie save initial")
+				output.Errorf("No hay snapshots guardados")
+				output.Infof("Creá uno con: snapordie save")
+				output.Infof("  snapordie save inicial")
 				return
 			}
 
 			output.Headerf("Snapshots")
-			output.Infof("Storage  %s/.snapordie", dataDir)
+			output.Infof("Directorio  %s/.snapordie", dataDir)
 
 			headerStyle := lipgloss.NewStyle().Bold(true)
 			t := table.New().
-				Headers("Name", "Size", "Age", "Container").
+				Headers("Nombre", "Tamaño", "Antigüedad", "Container").
 				Border(lipgloss.NormalBorder()).
 				BorderHeader(true).
 				StyleFunc(func(row, col int) lipgloss.Style {
@@ -53,7 +53,7 @@ Examples:
 			}
 
 			fmt.Fprintln(output.Writer(), "\n"+t.String())
-			output.Infof("Run %q to restore", "snapordie reset <name>")
+			output.Infof("Para restaurar: snapordie reset <nombre>")
 		})
 		return nil
 	},
@@ -63,12 +63,12 @@ func humanAge(t time.Time) string {
 	d := time.Since(t).Round(time.Second)
 	switch {
 	case d.Hours() >= 48:
-		return fmt.Sprintf("%.0fd ago", d.Hours()/24)
+		return fmt.Sprintf("%.0fd", d.Hours()/24)
 	case d.Hours() >= 2:
-		return fmt.Sprintf("%.0fh ago", d.Hours())
+		return fmt.Sprintf("%.0fh", d.Hours())
 	case d.Minutes() >= 2:
-		return fmt.Sprintf("%.0fm ago", d.Minutes())
+		return fmt.Sprintf("%.0fm", d.Minutes())
 	default:
-		return fmt.Sprintf("%.0fs ago", d.Seconds())
+		return fmt.Sprintf("%.0fs", d.Seconds())
 	}
 }

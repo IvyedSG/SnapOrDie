@@ -16,21 +16,21 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "snapordie",
-	Short:             "Instant Docker database snapshots",
+	Short: "Snapshots instantáneos de bases Docker",
+	Long: `SnapOrDie guarda y restaura snapshots de bases de datos Docker
+usando copy-on-write (APFS en macOS, reflink en Linux).
+
+Guardá el estado de tu MySQL/MariaDB, y volvé a él
+al instante — sin esperar 3 minutos por un import SQL.
+
+Comandos:
+  save [name]     Guardar un snapshot
+  reset [name]    Restaurar base de datos a un snapshot
+  list            Listar snapshots
+  info <name>     Ver detalle de un snapshot
+  rm <name>       Eliminar un snapshot`,
 	SilenceUsage:      true,
 	SilenceErrors:     true,
-	Long: `SnapOrDie saves and restores Docker database snapshots
-using copy-on-write (APFS on macOS, reflink on Linux).
-
-Save a snapshot of your MySQL/MariaDB state, then reset
-to it instantly — no more waiting 3 minutes for a SQL import.
-
-Commands:
-  save [name]     Save a snapshot
-  reset [name]    Reset database to a snapshot
-  list            List all snapshots
-  info <name>     Show snapshot details
-  rm <name>       Delete a snapshot`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		output.Init()
 	},
@@ -44,9 +44,9 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "disable colored output")
+	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "desactivar colores")
 	rootCmd.PersistentFlags().StringVar(&containerFlag, "container", "",
-		"Docker container name (auto-detected if empty)")
+		"nombre del container Docker (se auto-detecta si está vacío)")
 
 	rootCmd.AddCommand(saveCmd)
 	rootCmd.AddCommand(resetCmd)
@@ -59,14 +59,14 @@ func withContainer(name string, fn func(container, dataDir string)) bool {
 	if name != "" {
 		c, err := docker.Inspect(name)
 		if err != nil {
-			output.Errorf("Container %q not found", name)
-			output.Infof("Check the name: docker ps")
+			output.Errorf("Container %q no encontrado", name)
+			output.Infof("Verificá el nombre con: docker ps")
 			return false
 		}
 		dataDir := docker.DataDir(c)
 		if dataDir == "" {
-			output.Errorf("Container %q has no MySQL data dir mounted", name)
-			output.Infof("Expected a bind mount for /var/lib/mysql")
+			output.Errorf("El container %q no tiene un directorio MySQL montado", name)
+			output.Infof("Se necesita un bind mount para /var/lib/mysql")
 			return false
 		}
 		fn(c.Name, dataDir)
@@ -75,19 +75,19 @@ func withContainer(name string, fn func(container, dataDir string)) bool {
 
 	c, err := docker.Detect()
 	if err != nil {
-		output.Errorf("No MySQL/MariaDB container detected")
-		output.Infof("Make sure your database container is running:")
+		output.Errorf("No se detectó ningún container MySQL/MariaDB corriendo")
+		output.Infof("Asegurate de tener la base levantada:")
 		output.Infof("  docker compose up -d mysql")
-	fmt.Fprintln(output.Writer())
-	output.Infof("Or specify the container manually:")
-		output.Infof("  snapordie save --container <name>")
+		fmt.Fprintln(output.Writer())
+		output.Infof("O especificá el container manualmente:")
+		output.Infof("  snapordie save --container <nombre>")
 		return false
 	}
 
 	dataDir := docker.DataDir(c)
 	if dataDir == "" {
-		output.Errorf("Container %q has no MySQL data dir mounted", c.Name)
-		output.Infof("This container needs a bind mount for /var/lib/mysql")
+		output.Errorf("El container %q no tiene un directorio MySQL montado", c.Name)
+		output.Infof("Este container necesita un bind mount para /var/lib/mysql")
 		return false
 	}
 
