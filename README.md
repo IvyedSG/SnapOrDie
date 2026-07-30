@@ -10,15 +10,15 @@ Snapshots instantáneos de bases Docker usando copy-on-write.
 
 ## El problema
 
-Restaurás un dump SQL de 2.8 GB para debuggear un bug. Tarda **3 minutos**. Encontrás el problema, lo arreglás, y necesitás probar de nuevo. Otros 3 minutos. Y otra vez. Y otra vez.
+Restauras un dump SQL de 2.8 GB para debuggear un bug. Tarda **3 minutos**. Encuentras el problema, lo arreglas, y necesitas probar de nuevo. Otros 3 minutos. Y otra vez.
 
-SnapOrDie guarda todo el directorio de datos de MySQL y lo restaura en **menos de un segundo** usando APFS copy-on-write (macOS) o reflink (Linux). Nada de imports SQL. Nada de esperar.
+SnapOrDie guarda todo el directorio de datos de MySQL y lo restaura en **menos de un segundo** usando APFS copy-on-write (macOS) o reflink (Linux). Nada de imports SQL. Sin esperar.
 
 ```bash
-# Guardá un estado limpio una sola vez
+# Guarda un estado limpio una sola vez
 snapordie save clean
 
-# Debuggeá, rompé, arreglá, repetí — reset en milisegundos
+# Debuggea, rompe, arregla, repite — reset en milisegundos
 snapordie reset clean
 ```
 
@@ -32,9 +32,9 @@ snapordie reset clean
 go install github.com/IvyedSG/SnapOrDie@latest
 ```
 
-### Descargar binary
+### Descargar binario
 
-Descargá la última versión de [GitHub Releases](https://github.com/IvyedSG/SnapOrDie/releases), extraé y mové a tu `$PATH`:
+Descarga la última versión desde [GitHub Releases](https://github.com/IvyedSG/SnapOrDie/releases), extrae y mueve a tu `$PATH`:
 
 ```bash
 tar xzf snapordie_*.tar.gz
@@ -52,9 +52,9 @@ sudo mv snapordie /usr/local/bin/
 
 ---
 
-## Cómo empezar
+## Comenzar
 
-### 1. Guardá tu primer snapshot
+### 1. Guarda tu primer snapshot
 
 ```bash
 # Auto-detecta el container MySQL/MariaDB corriendo
@@ -71,14 +71,14 @@ snapordie save clean
  ◆ Snapshot "clean" listo
 ```
 
-### 2. Trabajá, rompé, ejecutá migrations
+### 2. Trabaja, rompe, ejecuta migrations
 
 ```bash
 pnpm prisma:deploy
-# ... test, debug, repetí ...
+# ... test, debug, repite ...
 ```
 
-### 3. Volvé al snapshot al instante
+### 3. Vuelve al snapshot al instante
 
 ```bash
 snapordie reset clean
@@ -86,13 +86,13 @@ snapordie reset clean
 
 ```
  ── Restaurar ───────────────────────────────────
- ◇ Snapshot  clean  (el más reciente)
+ ◇ Snapshot  clean  (el mas reciente)
  · Container  emusa_mysql
  ◆ Deteniendo container                       210ms
  ◆ Restaurando snapshot                        80ms
  ◆ Iniciando container                        410ms
  ◆ Base de datos restaurada a "clean"
- · Ejecutá migrations si cambió el schema
+ · Ejecuta migrations si cambio el schema
 ```
 
 ---
@@ -121,7 +121,7 @@ snapordie reset clean
 # Guardar con nombre personalizado
 snapordie sv antes-de-migration
 
-# Restaurar un snapshot específico
+# Restaurar un snapshot especifico
 snapordie rs bug-1234
 
 # Listar snapshots en tabla
@@ -139,7 +139,7 @@ snapordie save --container emusa_mysql
 
 ---
 
-## Cómo funciona
+## Como funciona
 
 1. **Detecta** — busca un container MySQL/MariaDB corriendo via `docker ps` e inspecciona sus mounts para ubicar el directorio de datos en el host.
 
@@ -148,11 +148,11 @@ snapordie save --container emusa_mysql
 3. **Clona** — copia el directorio de datos usando copy-on-write:
    - macOS: `cp -c` (APFS nativo, instantáneo)
    - Linux: `cp --reflink=always` (btrfs/xfs, instantáneo)
-   - Fallback: `cp -a` (copia normal, más lenta)
+   - Fallback: `cp -a` (copia normal, mas lenta)
 
 4. **Inicia** — reinicia el container y espera a que esté healthy.
 
-Los snapshots viven en `.snapordie/` junto al directorio de datos de MySQL. Cada snapshot es un clon completo del directorio. En filesystems CoW no ocupan espacio extra hasta que modificás datos.
+Los snapshots viven en `.snapordie/` junto al directorio de datos de MySQL. Cada snapshot es un clon completo del directorio. En filesystems CoW no ocupan espacio extra hasta que modificas datos.
 
 ```
 data/mysql/
@@ -170,23 +170,23 @@ data/mysql/
 Así se usa SnapOrDie en un ciclo de debugging con Prisma + MySQL:
 
 ```bash
-# 1. Restaurá fresco desde SQL dump (lento, una sola vez)
+# 1. Restaura fresco desde SQL dump (lento, una sola vez)
 ./restore-backup.sh staging_dump.sql
 pnpm prisma:deploy
 
-# 2. Guardá el estado limpio
+# 2. Guarda el estado limpio
 snapordie save clean
 
-# 3. Iterá sobre un bug
-# Cambiás código → probás → encontrás bug → arreglás → probás de nuevo
-# ¿Base sucia? Reseteá.
+# 3. Itera sobre un bug
+# Cambias codigo → pruebas → encuentras bug → arreglas → pruebas de nuevo
+# Base sucia? Resetea.
 snapordie rs clean
 
 # 4. Antes de una migration riesgosa
 pnpm prisma:migrate-dev
 snapordie sv antes-de-migration
 
-# 5. ¿La migration rompió algo? Volvé.
+# 5. La migration rompio algo? Vuelve.
 snapordie rs clean
 ```
 
@@ -196,7 +196,7 @@ snapordie rs clean
 
 - Solo MySQL/MariaDB (auto-detectado). Soporte para PostgreSQL planeado.
 - Requiere Docker instalado y corriendo.
-- Los WAL y redo logs están en el directorio de datos y se snapshotearn tal cual.
+- Los WAL y redo logs están en el directorio de datos y se snapshotear tal cual.
 - Funciona con cualquier bind mount de MySQL en `/var/lib/mysql`.
 - El flag `--container` sobreescribe la auto-detección para setups multi-container.
 
