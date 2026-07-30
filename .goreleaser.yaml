@@ -37,20 +37,6 @@ archives:
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
 
-brews:
-  - repository:
-      owner: IvyedSG
-      name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    directory: Formula
-    homepage: "https://github.com/IvyedSG/SnapOrDie"
-    description: "Snapshots instantaneos de bases Docker usando copy-on-write"
-    license: "MIT"
-    test: |
-      system "#{bin}/snapordie version"
-    install: |
-      bin.install "snapordie"
-
 changelog:
   sort: asc
   filters:
